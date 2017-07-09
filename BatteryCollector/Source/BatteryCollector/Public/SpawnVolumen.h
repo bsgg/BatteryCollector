@@ -34,6 +34,17 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Spawning")
 	TSubclassOf<class APickup> WhatToSpawn;
 
+	// Handle spawn timer
+	FTimerHandle SpawnTimer;
+
+	// Minimun spawn delay
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
+	float SpawnDelayRangeLow;
+
+	// Maximun spawn delay
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
+	float SpawnDelayRangeHigh;
+
 private:
 
 	// Box component to specify where pickups should be spawned
@@ -42,4 +53,7 @@ private:
 	
 	// Handle spawning a new pickup
 	void SpawnPickup();
+
+	// The current spawn dealy
+	float SpawnDelay;
 };

@@ -12,10 +12,13 @@ ASpawnVolumen::ASpawnVolumen()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-
 	// Set wheretospawn as a root
 	WhereToSpawn = CreateDefaultSubobject<UBoxComponent>(TEXT("WhereToSpawn"));
 	RootComponent = WhereToSpawn;
+
+	// Set spawn delay range
+	SpawnDelayRangeLow = 1.0f;
+	SpawnDelayRangeHigh = 4.5f;
 
 }
 
@@ -23,7 +26,10 @@ ASpawnVolumen::ASpawnVolumen()
 void ASpawnVolumen::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	// Set timer and bind it to SpawnPickup method
+	SpawnDelay = FMath::FRandRange(SpawnDelayRangeLow, SpawnDelayRangeHigh);	
+	GetWorldTimerManager().SetTimer(SpawnTimer, this, &ASpawnVolumen::SpawnPickup, SpawnDelay, false);
 }
 
 // Called every frame
@@ -65,6 +71,11 @@ void  ASpawnVolumen::SpawnPickup()
 
 		// Spawn the pickup
 		APickup* const  spawnedPickup = world->SpawnActor<APickup>(WhatToSpawn, spawnLoc, spawnRotator, spawnParamenters);
+
+
+		// Reset random timer to call SpawnPickup
+		SpawnDelay = FMath::FRandRange(SpawnDelayRangeLow, SpawnDelayRangeHigh);
+		GetWorldTimerManager().SetTimer(SpawnTimer, this, &ASpawnVolumen::SpawnPickup, SpawnDelay, false);
 		
 	}
 }
