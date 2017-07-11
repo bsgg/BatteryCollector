@@ -3,6 +3,7 @@
 #include "BatteryCollector.h"
 #include "Kismet/HeadMountedDisplayFunctionLibrary.h"
 #include "BatteryCollectorCharacter.h"
+#include "Pickup.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ABatteryCollectorCharacter
@@ -59,6 +60,11 @@ void ABatteryCollectorCharacter::SetupPlayerInputComponent(class UInputComponent
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+
+
+	// Bind collect input
+	PlayerInputComponent->BindAction("Collect", IE_Released, this, &ABatteryCollectorCharacter::CollectPickups);
+
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ABatteryCollectorCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ABatteryCollectorCharacter::MoveRight);
@@ -134,4 +140,26 @@ void ABatteryCollectorCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void ABatteryCollectorCharacter::CollectPickups()
+{
+	// Get all overlapping actors
+	TArray<AActor*> collectedActors;
+	CollectionSphere->GetOverlappingActors(collectedActors);
+
+	// Check if there is any pickup
+	for (int32 iCollected = 0; iCollected < collectedActors.Num(); ++iCollected)
+	{
+		APickup* const testPickup = Cast<APickup>(collectedActors[iCollected]);
+
+		// If it's a pickup and not pending of kill and is active
+		// then, collect the pickup and deactivate
+		if (testPickup && !testPickup->IsPendingKill() && testPickup->IsActive())
+		{
+			testPickup->WasCollected();
+			testPickup->SetActive(false);
+		}
+	}
+
 }
