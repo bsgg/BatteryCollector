@@ -19,5 +19,17 @@ public:
 	
 	// Override the WasCollected function, use implementation because it's a blueprint native event
 	void WasCollected_Implementation() override;
+
+	// Public accessor the Battery's power
+	float GetPower();
+
+
+protected:
+
+	// Set the amount of power the battery gives to the character
+	// BlueprintProtected: This function can only be called on 'this' in a Blueprint. It cannot be called on another instance.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power", Meta =(BlueprintProtected = "true"))
+	float BatteryPower;
+
 	
 };
