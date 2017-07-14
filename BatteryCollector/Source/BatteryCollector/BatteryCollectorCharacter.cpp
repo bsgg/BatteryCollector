@@ -4,6 +4,7 @@
 #include "Kismet/HeadMountedDisplayFunctionLibrary.h"
 #include "BatteryCollectorCharacter.h"
 #include "Pickup.h"
+#include "BatteryPickup.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ABatteryCollectorCharacter
@@ -152,6 +153,9 @@ void ABatteryCollectorCharacter::CollectPickups()
 	TArray<AActor*> collectedActors;
 	CollectionSphere->GetOverlappingActors(collectedActors);
 
+	// Keep track of the collected battery power
+	float collectedPower = 0;
+
 	// Check if there is any pickup
 	for (int32 iCollected = 0; iCollected < collectedActors.Num(); ++iCollected)
 	{
@@ -162,8 +166,23 @@ void ABatteryCollectorCharacter::CollectPickups()
 		if (testPickup && !testPickup->IsPendingKill() && testPickup->IsActive())
 		{
 			testPickup->WasCollected();
+
+			// Check if pickup is a battery and collect the power
+			ABatteryPickup* const batteryTest = Cast<ABatteryPickup>(testPickup);
+			if (batteryTest)
+			{
+				collectedPower += batteryTest->GetPower();
+			}
+
+			// Disable pickup
 			testPickup->SetActive(false);
 		}
+	}
+
+	// Update power in the character
+	if (collectedPower > 0.0f)
+	{
+		UpdatePower(collectedPower);
 	}
 }
 
