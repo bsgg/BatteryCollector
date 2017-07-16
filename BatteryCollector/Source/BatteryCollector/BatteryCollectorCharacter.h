@@ -86,8 +86,20 @@ protected:
 	void CollectPickups();
 
 	// The starting power level of our character
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power", Meta = (BlueprintProtected))
 	float InitialPower;
+
+	/** Multiplier for character speed */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power", Meta = (BlueprintProtected))
+	float SpeedFactor;
+
+	/** Speed when power lever is 0 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power", Meta = (BlueprintProtected))
+	float BaseSpeed;
+
+	/** BlueprintImplementableEvent: The function can be overridden in a Blueprint or Level Blueprint graph. No need an implementation in c++, only in blueprint*/
+	UFUNCTION(BlueprintImplementableEvent, Category = "Power")
+	void PowerChangeEffect();
 
 private:
 
