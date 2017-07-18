@@ -35,6 +35,8 @@ public:
 	void SetActive(bool NewPickupState);
 
 	// Function to call when the pickup is collected
+	// WasCollected is the function event that can be called in blueprint
+	// WasCollected_Implementation: Function that must be imiplemented in code cpp.
 	UFUNCTION(BlueprintNativeEvent)
 	void WasCollected();
 	virtual void WasCollected_Implementation();
