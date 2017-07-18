@@ -4,6 +4,7 @@
 #include "BatteryCollectorGameMode.h"
 #include "BatteryCollectorCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "Blueprint/UserWidget.h"
 
 ABatteryCollectorGameMode::ABatteryCollectorGameMode()
 {
@@ -18,6 +19,30 @@ ABatteryCollectorGameMode::ABatteryCollectorGameMode()
 
 	// Set base decay rate
 	DecayRate = 0.01f;
+}
+
+void ABatteryCollectorGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// Set the socre to beat
+	// Check that we are using the battery collector chacarter
+	ABatteryCollectorCharacter* character = Cast<ABatteryCollectorCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
+
+	if (character)
+	{
+		PowerToWin = character->GetInitialPower() * 1.25f;
+	}
+
+	if (HUDWidgetClass != nullptr)
+	{
+		CurrentWidget = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetClass);
+
+		if (CurrentWidget != nullptr)
+		{
+			CurrentWidget->AddToViewport();
+		}
+	}
 }
 
 
@@ -38,4 +63,9 @@ void ABatteryCollectorGameMode::Tick(float DeltaTime)
 		}
 	}
 
+}
+
+float ABatteryCollectorGameMode::GetPowerToWin() const
+{
+	return PowerToWin;
 }
