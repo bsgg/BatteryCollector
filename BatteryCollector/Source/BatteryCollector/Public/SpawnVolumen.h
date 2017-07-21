@@ -29,6 +29,11 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Spawning")
 	FVector GetRandomPointInVolume();
 
+	/** This function toggles whther or not the spanw volumen pawns pickups*/
+	UFUNCTION(BlueprintCallable, Category = "Spawning")
+	void SetSpawningActive(bool bShouldSpawn);
+
+
 protected:
 	// The pickup to spawn
 	UPROPERTY(EditAnywhere, Category = "Spawning")
@@ -43,7 +48,7 @@ protected:
 
 	// Maximun spawn delay
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
-	float SpawnDelayRangeHigh;
+	float SpawnDelayRangeHigh;	
 
 private:
 

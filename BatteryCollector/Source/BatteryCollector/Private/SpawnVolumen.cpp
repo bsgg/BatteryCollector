@@ -27,9 +27,7 @@ void ASpawnVolumen::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Set timer and bind it to SpawnPickup method
-	SpawnDelay = FMath::FRandRange(SpawnDelayRangeLow, SpawnDelayRangeHigh);	
-	GetWorldTimerManager().SetTimer(SpawnTimer, this, &ASpawnVolumen::SpawnPickup, SpawnDelay, false);
+	
 }
 
 // Called every frame
@@ -79,4 +77,20 @@ void  ASpawnVolumen::SpawnPickup()
 		
 	}
 }
+
+void ASpawnVolumen::SetSpawningActive(bool bShouldSpawn)
+{
+	if (bShouldSpawn)
+	{
+		// Set timer and bind it to SpawnPickup method
+		SpawnDelay = FMath::FRandRange(SpawnDelayRangeLow, SpawnDelayRangeHigh);
+		GetWorldTimerManager().SetTimer(SpawnTimer, this, &ASpawnVolumen::SpawnPickup, SpawnDelay, false);
+	}
+	else
+	{
+		// clear the timer on spanw pickup
+		GetWorldTimerManager().ClearTimer(SpawnTimer);
+	}
+}
+
 

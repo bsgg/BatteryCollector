@@ -20,6 +20,10 @@ class ABatteryCollectorCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USphereComponent* CollectionSphere;
 
+
+	
+
+
 public:
 	ABatteryCollectorCharacter();
 
@@ -45,6 +49,12 @@ public:
 	**/
 	UFUNCTION(BlueprintCallable, Category = "Power")
 	void UpdatePower(float PowerChange);
+
+
+	// Accessor function for number of batteries collected
+	UFUNCTION(BlueprintPure, Category = "Power")
+	int GetCurrentCollectedBatteries() const;
+
 
 protected:
 
@@ -107,6 +117,10 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Power")
 	float CharacterPower;
 
+
+	/** Number of collected bateries */
+	UPROPERTY(VisibleAnywhere, Category = "Power")
+	float CollectedBatteries;
 
 public:
 	/** Returns CameraBoom subobject **/

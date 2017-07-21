@@ -5,6 +5,7 @@
 #include "BatteryCollectorCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
+#include "SpawnVolumen.h"
 
 ABatteryCollectorGameMode::ABatteryCollectorGameMode()
 {
@@ -24,6 +25,23 @@ ABatteryCollectorGameMode::ABatteryCollectorGameMode()
 void ABatteryCollectorGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Find all spawn volumen actors
+	TArray<AActor*> foundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASpawnVolumen::StaticClass(), foundActors);
+	for (auto actor : foundActors)
+	{
+		ASpawnVolumen* spanwVolumeActor = Cast<ASpawnVolumen>(actor);
+		int numberSpawnVolumen = 0;
+		if (spanwVolumeActor)
+		{
+			numberSpawnVolumen++;
+			UE_LOG(LogClass, Warning, TEXT("[ABatteryCollectorGameMode]Add new spawnvolumen"));
+			SpawnVolumeActors.AddUnique(spanwVolumeActor);
+		}
+
+		UE_LOG(LogClass, Warning, TEXT("[ABatteryCollectorGameMode]Number spawn volumens %i"), numberSpawnVolumen);
+	}
 
 
 	// Set state to playing
@@ -47,6 +65,7 @@ void ABatteryCollectorGameMode::BeginPlay()
 			CurrentWidget->AddToViewport();
 		}
 	}
+	
 }
 
 
@@ -99,4 +118,73 @@ EBatteryPlayState ABatteryCollectorGameMode::GetCurrentState() const
 void ABatteryCollectorGameMode::SetCurrentState(EBatteryPlayState NewState)
 {
 	CurrentState = NewState;
+
+	// Handles the new state
+	HandleNewState(CurrentState);
+}
+
+void ABatteryCollectorGameMode::HandleNewState(EBatteryPlayState NewState)
+{
+	switch (NewState)
+	{
+		// Game is playing 
+		case EBatteryPlayState::VE_Playing:
+		{
+			// Spawn volumens actives
+			for (ASpawnVolumen* volumen : SpawnVolumeActors)
+			{
+				UE_LOG(LogClass, Warning, TEXT("[HandleNewState]enable volumen"));
+				volumen->SetSpawningActive(true);
+			}
+
+		}
+		break;
+
+		// We won the game
+		case EBatteryPlayState::VE_Won:
+		{
+			// Spawn volumens inactives
+			for (ASpawnVolumen* volumen : SpawnVolumeActors)
+			{
+				volumen->SetSpawningActive(false);
+			}
+		}
+		break;
+
+		// We lost the game
+		case EBatteryPlayState::VE_GameOver:
+		{
+			// Spawn volumens inactives
+			for (ASpawnVolumen* volumen : SpawnVolumeActors)
+			{
+				volumen->SetSpawningActive(false);
+			}
+
+			// Block player input through SetCinematicMode
+			APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0);
+			if (playerController)
+			{
+				playerController->SetCinematicMode(true, false, false, true, true);
+			}
+			
+			// Ragdoll the chracter			
+			ACharacter* character = UGameplayStatics::GetPlayerCharacter(this, 0);
+			if (character)
+			{
+				character->GetMesh()->SetSimulatePhysics(true);
+				character->GetMovementComponent()->MovementState.bCanJump = false;
+			}
+
+		}
+		break;
+
+		// Unknown and default
+		default:
+		case EBatteryPlayState::VE_Unknow:
+		{
+			// Don´t do anything
+		}
+		break;
+	}
+
 }

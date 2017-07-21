@@ -56,6 +56,9 @@ ABatteryCollectorCharacter::ABatteryCollectorCharacter()
 	// Set the dependance of th e speed on the power lever
 	SpeedFactor = 0.75f;
 	BaseSpeed = 10.0f;
+
+	// Set number collected batteries
+	CollectedBatteries = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -170,14 +173,16 @@ void ABatteryCollectorCharacter::CollectPickups()
 			testPickup->WasCollected();
 
 			// Check if pickup is a battery and collect the power
-			ABatteryPickup* const batteryTest = Cast<ABatteryPickup>(testPickup);
-			if (batteryTest)
+			ABatteryPickup* const batteryPickup = Cast<ABatteryPickup>(testPickup);
+			if (batteryPickup)
 			{
-				collectedPower += batteryTest->GetPower();
+				collectedPower += batteryPickup->GetPower();
+				// Add 1 to collected batteires
+				CollectedBatteries += 1;
 			}
 
 			// Disable pickup
-			testPickup->SetActive(false);
+			batteryPickup->SetActive(false);
 		}
 	}
 
@@ -209,4 +214,9 @@ void ABatteryCollectorCharacter::UpdatePower(float PowerChange)
 
 	// Call visual effect
 	PowerChangeEffect();
+}
+
+int ABatteryCollectorCharacter::GetCurrentCollectedBatteries() const
+{
+	return CollectedBatteries;
 }
